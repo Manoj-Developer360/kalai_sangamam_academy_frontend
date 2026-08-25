@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiMapPin, FiPhone, FiMail, FiCalendar, FiCheckCircle, FiAlertTriangle, FiAlertCircle } from 'react-icons/fi';
 import PublicLayout from '../../layouts/PublicLayout.jsx';
 import SectionHeading from '../../components/common/SectionHeading';
 import api from '../../services/api';
+import { publicService } from '../../services/publicService';
 
 /* ============================================================================
  * NOTE — FRONTEND-ONLY CONTACT PAGE
@@ -21,7 +22,7 @@ import api from '../../services/api';
  * swap. Replace values here, or fetch them and pass the shape through.
  * ==========================================================================*/
 
-const branches = [
+const FALLBACK_BRANCHES = [
   {
     id: 'main',
     name: 'Main Branch',
@@ -60,7 +61,7 @@ const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
 // Google's "Embed a map" dialog copies the entire <iframe ...></iframe> tag,
 // not just the src URL. Accept either form so a pasted embed snippet works.
 const extractMapSrc = (value = '') => {
-  const trimmed = value.trim();
+  const trimmed = String(value || '').trim();
   if (!trimmed) return '';
   const match = trimmed.match(/src=["']([^"']+)["']/i);
   return match ? match[1] : trimmed;
@@ -422,7 +423,7 @@ const validateEnrolment = (values) => {
   return errors;
 };
 
-const GameEnrolmentForm = () => {
+const GameEnrolmentForm = ({ branches }) => {
   const [values, setValues] = useState(ENROL_INITIAL);
   const [errors, setErrors] = useState({});
   const { status, errorMessage, submit, reset } = useFormSubmit();
@@ -641,9 +642,24 @@ const EventEnquiry = () => {
 
 const SectionDivider = () => <div className="border-t border-parchment-100/10" aria-hidden="true" />;
 
+const toContactBranch = (branch) => ({
+  ...branch,
+  phoneNumbers: [branch.contact_number_1, branch.contact_number_2, branch.contact_number_3].filter(Boolean),
+  mapEmbedUrl: branch.map_url,
+});
+
 const Contact = () => {
-  const mainBranch = branches.find((b) => b.id === 'main') || branches[0];
-  const otherBranches = branches.filter((b) => b.id !== 'main');
+  const [branches, setBranches] = useState(FALLBACK_BRANCHES);
+  useEffect(() => {
+    publicService.getBranches().then(({ data }) => {
+      const liveBranches = (data.data || []).map(toContactBranch);
+      if (liveBranches.length) setBranches(liveBranches);
+    }).catch(() => {});
+  }, []);
+  // Live branch IDs are UUIDs. The first display-order branch is the main one;
+  // use its actual ID when excluding it from the "Other" section.
+  const mainBranch = branches.find((b) => b.id === 'main' || b.display_order === 1) || branches[0];
+  const otherBranches = branches.filter((b) => b.id !== mainBranch?.id);
 
   return (
     <PublicLayout>
@@ -672,7 +688,7 @@ const Contact = () => {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8 items-stretch">
-              <GameEnrolmentForm />
+              <GameEnrolmentForm branches={branches} />
               <EventEnquiry />
             </div>
           </div>

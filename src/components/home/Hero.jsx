@@ -81,11 +81,40 @@ const EventQueueControls = ({
   );
 };
 
+const FlashNewsCard = ({ announcement }) => {
+  const isCommonNews = announcement.branch?.trim().toLowerCase() === "common";
+
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-brass-500/30 bg-ink-900/90 px-4 py-3 shadow-[0_16px_36px_-22px_rgba(224,133,50,0.85)] backdrop-blur-md">
+      <span aria-label="Flash News" className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-brass-500/30 bg-ink-900/90 text-brass-400">
+        <FiZap aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        {!isCommonNews && (
+          <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-brass-400">
+            <FiMapPin aria-hidden="true" className="text-xs" />
+            <span>{announcement.branch}</span>
+          </div>
+        )}
+        <marquee
+          className="block w-full text-sm leading-relaxed text-parchment-100"
+          behavior="scroll"
+          direction="left"
+          scrollamount="3"
+          aria-label={`Flash News: ${announcement.description}`}
+        >
+          {announcement.description}
+        </marquee>
+      </div>
+    </div>
+  );
+};
+
 const Hero = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [activeEventIndex, setActiveEventIndex] = useState(0);
-  const [flashNews, setFlashNews] = useState("");
+  const [flashNews, setFlashNews] = useState(null);
 
   useEffect(() => {
     publicService
@@ -93,13 +122,23 @@ const Hero = () => {
       .then(({ data }) => setEvents(Array.isArray(data.data) ? data.data : []))
       .catch(() => setEvents([]));
 
-    publicService
-      .getSiteSettings()
-      .then(({ data }) => {
-        const value = data?.data?.flash_news || "";
-        setFlashNews(String(value).trim());
-      })
-      .catch(() => setFlashNews(""));
+  }, []);
+
+  useEffect(() => {
+    publicService.getHeroAnnouncement().then(({ data }) => {
+      const announcement = data?.data;
+      if (announcement) {
+        setFlashNews({
+          branch: announcement.branches?.name || "Common",
+          description: announcement.description || announcement.title,
+        });
+        return;
+      }
+      return publicService.getSiteSettings().then(({ data: settings }) => {
+        const description = String(settings?.data?.flash_news || "").trim();
+        setFlashNews(description ? { branch: "Common", description } : null);
+      });
+    }).catch(() => setFlashNews(null));
   }, []);
 
   useEffect(() => {
@@ -128,41 +167,15 @@ const Hero = () => {
       </div>
 
       {flashNews && (
-        <div className="mb-4 flex justify-center lg:hidden">
-          <div className="flex w-80 max-w-md items-center gap-3 overflow-hidden rounded-full border border-brass-500/25 bg-ink-900/80 px-3 py-2 shadow-[0_10px_30px_-18px_rgba(224,133,50,0.8)] backdrop-blur-sm sm:max-w-lg">
-            <span className="shrink-0 font-mono text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-brass-500">
-              Flash News
-            </span>
-            <div className="min-w-0 flex-1 overflow-hidden">
-              <marquee
-                className="text-sm text-parchment-200"
-                behavior="scroll"
-                direction="left"
-                scrollamount="3"
-              >
-                <span>{flashNews}</span>
-              </marquee>
-            </div>
-          </div>
+        <div className="mx-auto mb-4 w-[min(100%-2rem,34rem)] lg:hidden">
+          <FlashNewsCard announcement={flashNews} />
         </div>
       )}
 
       <div className="relative lg:min-h-[42rem]">
         {flashNews && (
-          <div className="absolute left-1/2 top-0 z-30 hidden w-[min(32rem,calc(100%-3rem))] -translate-x-1/2 items-center gap-3 overflow-hidden rounded-full border border-brass-500/25 bg-ink-900/85 px-4 py-2.5 shadow-[0_10px_30px_-18px_rgba(224,133,50,0.8)] backdrop-blur-md lg:flex">
-            <span className="shrink-0 font-mono text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-brass-500">
-              Flash News
-            </span>
-            <div className="min-w-0 flex-1 overflow-hidden">
-              <marquee
-                className="text-sm text-parchment-200"
-                behavior="scroll"
-                direction="left"
-                scrollamount="3"
-              >
-                <span>{flashNews}</span>
-              </marquee>
-            </div>
+          <div className="absolute left-1/2 top-0 z-30 hidden w-[min(34rem,calc(100%-3rem))] -translate-x-1/2 lg:block">
+            <FlashNewsCard announcement={flashNews} />
           </div>
         )}
 
