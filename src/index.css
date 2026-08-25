@@ -202,6 +202,10 @@
     background: linear-gradient(145deg, rgb(var(--color-ink-800)) 0%, rgb(var(--color-ink-950)) 100%);
   }
 
+  .master-card--programme {
+    min-height: 12rem;
+  }
+
   .master-card-photo-overlay {
     background: linear-gradient(to top, rgb(var(--master-overlay) / 0.96) 0%, rgb(var(--master-overlay) / 0.22) 44%, transparent 75%);
   }
