@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiFacebook, FiInstagram, FiYoutube, FiMapPin, FiPhone, FiMail, FiMessageCircle } from 'react-icons/fi';
+import logo from '../../assets/images/logo1.png';
 
 const whatsappUrl = (value) => {
   if (!value) return '';
@@ -11,7 +12,19 @@ const Footer = ({ site }) => (
   <footer className="border-t border-parchment-100/10 bg-ink-900/90 pt-16 pb-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
     <div className="container-xl grid grid-cols-1 md:grid-cols-4 gap-10">
       <div>
-        <h3 className="font-display text-xl font-semibold text-parchment-100 mb-3">Kalai <span className="text-brass-500">Sangamam</span></h3>
+        <Link
+          to="/"
+          className="mb-4 flex h-16 w-16 items-center justify-center sm:h-20 sm:w-20 lg:h-24 lg:w-24"
+          aria-label="Kalai Sangamam home"
+        >
+          <img
+            src={logo}
+            alt="Kalai Sangamam"
+            width="1254"
+            height="1254"
+            className="h-full w-full object-contain"
+          />
+        </Link>
         <p className="text-sm leading-relaxed text-parchment-300">A Dindigul academy for Silambam, Karate, Yoga, Skating, Archery and Hindi — discipline built one session at a time.</p>
         <div className="flex gap-4 mt-5 text-lg text-parchment-300">
           {site?.whatsapp && <a href={whatsappUrl(site.whatsapp)} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="transition-colors hover:text-brass-400"><FiMessageCircle /></a>}

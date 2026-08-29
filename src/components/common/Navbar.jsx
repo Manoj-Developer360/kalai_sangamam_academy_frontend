@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { FiMenu, FiUser, FiX } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
+import logo from '../../assets/images/logo1.png';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -47,8 +48,18 @@ const Navbar = () => {
       }`}
     >
       <div className="container-xl flex items-center justify-between h-16 lg:h-20">
-        <Link to="/" className="font-display text-xl lg:text-2xl font-semibold text-brass-400">
-          Kalai <span className="text-brass-500">Sangamam</span>
+        <Link
+          to="/"
+          className="flex h-11 w-11 shrink-0 items-center justify-center sm:h-12 sm:w-12 lg:h-14 lg:w-14"
+          aria-label="Kalai Sangamam home"
+        >
+          <img
+            src={logo}
+            alt="Kalai Sangamam"
+            width="1254"
+            height="1254"
+            className="h-full w-full object-contain"
+          />
         </Link>
 
         <nav className="hidden xl:flex items-center gap-6">
