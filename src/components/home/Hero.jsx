@@ -245,7 +245,6 @@ const Hero = () => {
             transition={{ duration: 0.6 }}
             className="relative lg:w-[46%]"
           >
-            <p className="eyebrow mb-4">Kalai Sangamam</p>
 
             {/* Tamil display heading — negative tracking removed and line-height opened up,
                 since Tamil conjuncts/matras clip under tight latin-style leading/tracking */}
@@ -303,8 +302,8 @@ const Hero = () => {
 
             <p className="hidden mt-6 max-w-xl text-base leading-relaxed text-slate-300 text-justify lg:block lg:text-lg">
               We blend tradition, disciplined training, and modern excellence to
-              build strength, focus, confidence, and character — from Silambam &
-              Karate to Yoga, Skating & Archery.
+              build strength, focus, confidence, and character — from Karate & Silambam 
+              to Yoga, Skating & Archery.
             </p>
 
             {/* discipline tags with icons */}
